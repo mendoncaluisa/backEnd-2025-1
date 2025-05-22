@@ -1,8 +1,11 @@
 package edu.ifmg.produto.resources;
 
 
-import edu.ifmg.produto.dtos.ProductDTO;
-import edu.ifmg.produto.services.ProductService;
+
+import edu.ifmg.produto.dtos.UserDTO;
+import edu.ifmg.produto.dtos.UserInsertDTO;
+
+import edu.ifmg.produto.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,45 +20,45 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/product")
-@Tag(name = "Product", description = "Controller/Resource for Products")
-public class ProductResource {
+@RequestMapping("/user")
+@Tag(name = "User", description = "Controller/Resource for Users")
+public class UserResource {
 
     @Autowired
-    private ProductService productService;
+    private UserService userService;
 
     //apenas adicionar o Pageable como parametro já exclui a necessidade de adicionar os @RequestParam porque ele já tem tudo pronto
     @GetMapping(produces = "application/json")
     @Operation(
-            description = "Get all products",
-            summary = "Get all products",
+            description = "Get all users",
+            summary = "Get all users",
             responses = {
                     @ApiResponse(description = "OK", responseCode = "200")
             }
     )
-    public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        Page<ProductDTO> products = productService.findAll(pageable);
-        return ResponseEntity.ok(products); //é a mesma coisa que ok().body(products);
+    public ResponseEntity<Page<UserDTO>> findAll(Pageable pageable) {
+        Page<UserDTO> users = userService.findAll(pageable);
+        return ResponseEntity.ok(users); //é a mesma coisa que ok().body(users);
     }
 
     @GetMapping (value = "/{id}", produces = "application/json")
     @Operation(
-            description = "Get a product",
-            summary = "Get a product",
+            description = "Get a user",
+            summary = "Get a user",
             responses = {
                     @ApiResponse(description = "OK", responseCode = "200"),
                     @ApiResponse(description = "Not found", responseCode = "404")
             }
     )
-    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
-        ProductDTO product = productService.findById(id);
-        return ResponseEntity.ok(product); //é a mesma coisa que ok().body(products);
+    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+        UserDTO user = userService.findById(id);
+        return ResponseEntity.ok(user); //é a mesma coisa que ok().body(products);
     }
 
     @PostMapping(produces = "application/json")
     @Operation(
-            description = "Create a new product",
-            summary = "Create a new product",
+            description = "Create a new user",
+            summary = "Create a new user",
             responses = {
                     @ApiResponse(description = "Created", responseCode = "201"),
                     @ApiResponse(description = "Bad Request", responseCode = "400"),
@@ -63,24 +66,24 @@ public class ProductResource {
                     @ApiResponse(description = "Forbidden", responseCode = "403"),
             }
     )
-    public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO dto) { //o @Valid serve pra aplicar as validaçoes que adicionamos no DTO (@Size, @Positive, ect.)
-        dto = productService.insert(dto);
+    public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserInsertDTO dto) { //o @Valid serve pra aplicar as validaçoes que adicionamos no DTO (@Size, @Positive, ect.)
+        UserDTO user = userService.insert(dto);
 
         //essa uri que retornamos já está atendendo ao HATEOAS - eu insiro um produto e ja digo pro cara o que eu posso fazer com aquele produto, e nesse caço ele foi no cabeçalho da resposta
         URI uri = ServletUriComponentsBuilder.
                 fromCurrentRequest(). //pega o caminho da minha aplicação
                         path("/{id}").//ele adiciona o id na rota
-                        buildAndExpand(dto.getId()).
+                        buildAndExpand(user.getId()).
                 toUri();
 
-        return ResponseEntity.created(uri).body(dto);
+        return ResponseEntity.created(uri).body(user);
     }
 
 
     @PutMapping(value = "/{id}", produces = "application/json")
     @Operation(
-            description = "Update a product",
-            summary = "Update a product",
+            description = "Update a user",
+            summary = "Update a user",
             responses = {
                     @ApiResponse(description = "OK", responseCode = "200"),
                     @ApiResponse(description = "Bad Request", responseCode = "400"),
@@ -89,16 +92,16 @@ public class ProductResource {
                     @ApiResponse(description = "Not found", responseCode = "404")
             }
     )
-    public ResponseEntity<ProductDTO> update(@Valid @PathVariable Long id, @RequestBody ProductDTO dto) {
-        dto = productService.update(id,dto);
+    public ResponseEntity<UserDTO> update(@Valid @PathVariable Long id, @RequestBody UserDTO dto) {
+        dto = userService.update(id,dto);
 
         return ResponseEntity.ok().body(dto);
     }
 
     @DeleteMapping(value="/{id}")
     @Operation(
-            description = "Delete a product",
-            summary = "Delete a product",
+            description = "Delete a user",
+            summary = "Delete a user",
             responses = {
                     @ApiResponse(description = "OK", responseCode = "200"),
                     @ApiResponse(description = "Bad Request", responseCode = "400"),
@@ -108,9 +111,13 @@ public class ProductResource {
             }
     )
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        productService.delete(id);
+        userService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
+
+
+
+
 
 }
